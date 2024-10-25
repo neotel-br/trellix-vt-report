@@ -66,12 +66,10 @@ def main():
     dados = [v for _, v in dados_sem_duplicados_dict.items()]
     
     with open('saida2', 'w', newline="") as f:
-            # Obtém as chaves do primeiro dicionário como cabeçalhos do CSV
             campos = dados[0].keys()
             escritor_csv = csv.DictWriter(f, fieldnames=campos)
-            # Escreve o cabeçalho
+            
             escritor_csv.writeheader()
-            # Escreve os dados
             escritor_csv.writerows(dados)
 
 if __name__ == "__main__":
