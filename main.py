@@ -5,6 +5,7 @@ from requests import get
 from pandas import read_csv, concat
 from json import dump
 import glob
+import csv
 
 
 VIRUSTOTAL_FILE_ENDPOINT = "https://www.virustotal.com/api/v3/files"
@@ -20,7 +21,7 @@ def main():
     args = parser.parse_args()
     caminho = path.abspath(args.input_folder)
 
-    arquivos = glob.glob(caminho + "/*")
+    arquivos = glob.glob(caminho + "/*.csv")
 
     dados = read_csv(arquivos[0])
     for arquivo in arquivos[1:]:
@@ -57,16 +58,19 @@ def main():
         dados_sem_duplicados_dict = dados_sem_duplicados.to_dict('index')
 
         for _, v in dados_sem_duplicados_dict.items():
-            if v["Target Hash"] == hashes_unicos[1297]:
-                v["Possível Tipo de Ameaça"] = resultado["Possível Tipo de Ameaça"]
-                v["Número de detecções maliciosas"] = resultado["Número de detecções maliciosas"]
-                v["Número de detecções não-maliciosas"] = resultado["Número de detecções não-maliciosas"]
-                v["Número de não detecções"] = resultado["Número de não detecções"]
+            v["Possível Tipo de Ameaça"] = resultado["Possível Tipo de Ameaça"]
+            v["Número de detecções maliciosas"] = resultado["Número de detecções maliciosas"]
+            v["Número de detecções não-maliciosas"] = resultado["Número de detecções não-maliciosas"]
+            v["Número de não detecções"] = resultado["Número de não detecções"]
 
-        dados = [v for _, v in dados_sem_duplicados_dict.items()]
-        with open('saida2', 'w') as f:
-            dump(dados, f)
-
+    dados = [v for _, v in dados_sem_duplicados_dict.items()]
+    
+    with open('saida2', 'w', newline="") as f:
+            campos = dados[0].keys()
+            escritor_csv = csv.DictWriter(f, fieldnames=campos)
+            
+            escritor_csv.writeheader()
+            escritor_csv.writerows(dados)
 
 if __name__ == "__main__":
     main()
