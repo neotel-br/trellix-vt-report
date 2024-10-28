@@ -66,6 +66,7 @@ def main():
                 v["Número de detecções maliciosas"] = resultado["Número de detecções maliciosas"]
                 v["Número de detecções não-maliciosas"] = resultado["Número de detecções não-maliciosas"]
                 v["Número de não detecções"] = resultado["Número de não detecções"]
+                
         dados = [v for _, v in dados_sem_duplicados_dict.items()]
         
         with open(nome_arquivo, 'w', newline="") as f:
