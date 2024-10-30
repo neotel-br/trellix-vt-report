@@ -21,7 +21,7 @@ def main():
     args = parser.parse_args()
     caminho = path.abspath(args.input_folder)
 
-    arquivos = glob.glob(caminho + "/*.csv")
+    arquivos = glob.glob(caminho)
 
     dados = read_csv(arquivos[0])
     for arquivo in arquivos[1:]:
