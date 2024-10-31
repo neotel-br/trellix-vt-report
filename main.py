@@ -61,16 +61,17 @@ def main():
             dados_sem_duplicados_dict = dados_sem_duplicados.to_dict('index')
 
             for _, v in dados_sem_duplicados_dict.items():
+                v["Possível Tipo de Ameaça"] = "N/A"
+                v["Número de detecções maliciosas"] = 0
+                v["Número de detecções não-maliciosas"] = 0
+                v["Número de não detecções"] = 0
+
+            for _, v in dados_sem_duplicados_dict.items():
                 if (v["Target Hash"] == hash_arq):
                     v["Possível Tipo de Ameaça"] = resultado["Possível Tipo de Ameaça"]
                     v["Número de detecções maliciosas"] = resultado["Número de detecções maliciosas"]
                     v["Número de detecções não-maliciosas"] = resultado["Número de detecções não-maliciosas"]
                     v["Número de não detecções"] = resultado["Número de não detecções"]
-                else:
-                    v["Possível Tipo de Ameaça"] = "N/A"
-                    v["Número de detecções maliciosas"] = 0
-                    v["Número de detecções não-maliciosas"] = 0
-                    v["Número de não detecções"] = 0
 
         dados = [v for _, v in dados_sem_duplicados_dict.items()]
 
