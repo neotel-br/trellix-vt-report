@@ -21,7 +21,7 @@ def main():
     args = parser.parse_args()
     caminho = path.abspath(args.input_folder)
 
-    arquivos = glob.glob(caminho)
+    arquivos = glob.glob(caminho + "/*.csv")
 
     dados = read_csv(arquivos[0])
     for arquivo in arquivos[1:]:
@@ -52,12 +52,15 @@ def main():
 
             print(hash_arq)
             resultado_sem_filtro = resposta.json()['data']['attributes']
+
+            #print(resultado_sem_filtro)
+
             resultado = {}
 
             resultado["Possível Tipo de Ameaça"] = "N/A" if "popular_threat_classification" not in resultado_sem_filtro else resultado_sem_filtro['popular_threat_classification']['suggested_threat_label']
             resultado["Número de detecções maliciosas"] = resultado_sem_filtro['last_analysis_stats']['malicious']
-            resultado["Número de detecções não-maliciosas"] = resultado_sem_filtro['last_analysis_stats']['harmless']
             resultado["Número de não detecções"] = resultado_sem_filtro['last_analysis_stats']['undetected']
+            resultado["Número de detecções não-maliciosas"] = resultado_sem_filtro['last_analysis_stats']['harmless']
 
             dados_sem_duplicados_dict = dados_sem_duplicados.to_dict('index')
 
@@ -66,9 +69,11 @@ def main():
                 v["Número de detecções maliciosas"] = resultado["Número de detecções maliciosas"]
                 v["Número de detecções não-maliciosas"] = resultado["Número de detecções não-maliciosas"]
                 v["Número de não detecções"] = resultado["Número de não detecções"]
-                
+            
+            #print(v)
+
         dados = [v for _, v in dados_sem_duplicados_dict.items()]
-        
+
         with open(nome_arquivo, 'w', newline="") as f:
                 campos = dados[0].keys()
                 escritor_csv = csv.DictWriter(f, fieldnames=campos)
