@@ -45,8 +45,6 @@ def main():
         for _, v in dados_sem_duplicados_dict.items():
             v["Possível Tipo de Ameaça"] = "N/A"
             v["Número de Detecções Maliciosas"] = 0
-            v["Número de Detecções Não-maliciosas"] = 0
-            v["Número de Não Detecções"] = 0
 
         for hash_arq in hashes_unicos:
             resposta = get(
@@ -63,15 +61,11 @@ def main():
 
             resultado["Possível Tipo de Ameaça"] = "N/A" if "popular_threat_classification" not in resultado_sem_filtro else resultado_sem_filtro['popular_threat_classification']['suggested_threat_label']
             resultado["Número de Detecções Maliciosas"] = resultado_sem_filtro['last_analysis_stats']['malicious']
-            resultado["Número de Detecções Não-maliciosas"] = resultado_sem_filtro['last_analysis_stats']['harmless']
-            resultado["Número de Não Detecções"] = resultado_sem_filtro['last_analysis_stats']['undetected']
 
             for _, v in dados_sem_duplicados_dict.items():
                 if (v["Target Hash"] == hash_arq):
                     v["Possível Tipo de Ameaça"] = resultado["Possível Tipo de Ameaça"]
                     v["Número de Detecções Maliciosas"] = resultado["Número de Detecções Maliciosas"]
-                    v["Número de Detecções Não-maliciosas"] = resultado["Número de Detecções Não-maliciosas"]
-                    v["Número de Não Detecções"] = resultado["Número de Não Detecções"]
 
         dados = [v for _, v in dados_sem_duplicados_dict.items()]
 
