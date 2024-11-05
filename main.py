@@ -34,7 +34,7 @@ def main():
  
     resposta = None
  
-    HEADERS = {'x-apikey': args.apikey, 'accept': 'application/json'}a
+    HEADERS = {'x-apikey': args.apikey, 'accept': 'application/json'}
  
     nome_arquivo = input("Digite o nome do arquivo csv final: ")
  
