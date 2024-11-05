@@ -28,7 +28,8 @@ def main():
         dados = concat([dados, read_csv(arquivo)], ignore_index=True)
 
     dados_sem_duplicados = dados.drop_duplicates()
-    hashes_unicos = dados_sem_duplicados["Target Hash"].loc[dados['Target Hash'] != ' ']
+    hashes = dados_sem_duplicados["Target Hash"].loc[dados['Target Hash'] != ' ']
+    hashes_unicos = hashes.drop_duplicates().dropna()
 
     resposta = None
 
@@ -39,8 +40,12 @@ def main():
     inp = input(
         f"ESSE RELATORIO CONTEM: {len(hashes_unicos)} hashes. Deseja continuar?(Y/N): ")
 
-
     if inp.upper() == 'Y':
+        dados_sem_duplicados_dict = dados_sem_duplicados.to_dict('index')
+        for _, v in dados_sem_duplicados_dict.items():
+            v["Possível Tipo de Ameaça"] = "N/A"
+            v["Número de Detecções Maliciosas"] = 0
+
         for hash_arq in hashes_unicos:
             resposta = get(
                 f"{VIRUSTOTAL_FILE_ENDPOINT}/{hash_arq}", headers=HEADERS)
@@ -52,36 +57,27 @@ def main():
 
             print(hash_arq)
             resultado_sem_filtro = resposta.json()['data']['attributes']
-
-            #print(resultado_sem_filtro)
-
             resultado = {}
 
             resultado["Possível Tipo de Ameaça"] = "N/A" if "popular_threat_classification" not in resultado_sem_filtro else resultado_sem_filtro['popular_threat_classification']['suggested_threat_label']
-            resultado["Número de detecções maliciosas"] = resultado_sem_filtro['last_analysis_stats']['malicious']
-            resultado["Número de não detecções"] = resultado_sem_filtro['last_analysis_stats']['undetected']
-            resultado["Número de detecções não-maliciosas"] = resultado_sem_filtro['last_analysis_stats']['harmless']
-
-            dados_sem_duplicados_dict = dados_sem_duplicados.to_dict('index')
+            resultado["Número de Detecções Maliciosas"] = resultado_sem_filtro['last_analysis_stats']['malicious']
 
             for _, v in dados_sem_duplicados_dict.items():
-                v["Possível Tipo de Ameaça"] = resultado["Possível Tipo de Ameaça"]
-                v["Número de detecções maliciosas"] = resultado["Número de detecções maliciosas"]
-                v["Número de detecções não-maliciosas"] = resultado["Número de detecções não-maliciosas"]
-                v["Número de não detecções"] = resultado["Número de não detecções"]
-            
-            #print(v)
+                if (v["Target Hash"] == hash_arq):
+                    v["Possível Tipo de Ameaça"] = resultado["Possível Tipo de Ameaça"]
+                    v["Número de Detecções Maliciosas"] = resultado["Número de Detecções Maliciosas"]
 
         dados = [v for _, v in dados_sem_duplicados_dict.items()]
 
         with open(nome_arquivo, 'w', newline="") as f:
-                campos = dados[0].keys()
-                escritor_csv = csv.DictWriter(f, fieldnames=campos)
-                
-                escritor_csv.writeheader()
-                escritor_csv.writerows(dados)
+            campos = dados[0].keys()
+            escritor_csv = csv.DictWriter(f, fieldnames=campos)
+
+            escritor_csv.writeheader()
+            escritor_csv.writerows(dados)
     else:
         print("Relatório cancelado")
+
 
 if __name__ == "__main__":
     main()
