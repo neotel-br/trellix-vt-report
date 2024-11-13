@@ -4,6 +4,7 @@ from time import sleep
 from requests import get
 from pandas import read_csv, concat
 from json import dump
+import pandas as pd
 import glob
 import csv
  
@@ -20,18 +21,18 @@ def main():
                         help="chave de api para o virustotal.com")
     args = parser.parse_args()
     caminho = path.abspath(args.input_folder)
- 
+    
     arquivos = glob.glob(caminho + "/*.csv")
- 
-    dados = read_csv(arquivos[0])
+    
+    dados = pd.read_csv(arquivos[0]).fillna(value=' ')
     for arquivo in arquivos[1:]:
-        dados = concat([dados, read_csv(arquivo)], ignore_index=True)
+        dados = pd.concat([dados, pd.read_csv(arquivo).fillna(value=' ')], ignore_index=True)
  
     dados_sem_duplicados = dados.drop_duplicates()
     dados_filtrados = dados_sem_duplicados[~dados_sem_duplicados['Event Description'].astype(str).str.contains('Infected file deleted.')]
     hashes = dados_filtrados["Target Hash"].loc[dados['Target Hash'] != ' ']
     hashes_unicos = hashes.drop_duplicates().dropna()
- 
+    
     resposta = None
  
     HEADERS = {'x-apikey': args.apikey, 'accept': 'application/json'}
