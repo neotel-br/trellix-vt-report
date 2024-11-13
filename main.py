@@ -4,7 +4,6 @@ from time import sleep
 from requests import get
 from pandas import read_csv, concat
 from json import dump
-import pandas as pd
 import glob
 import csv
  
@@ -24,9 +23,9 @@ def main():
     
     arquivos = glob.glob(caminho + "/*.csv")
     
-    dados = pd.read_csv(arquivos[0]).fillna(value=' ')
+    dados = read_csv(arquivos[0]).fillna(value='')
     for arquivo in arquivos[1:]:
-        dados = pd.concat([dados, pd.read_csv(arquivo).fillna(value=' ')], ignore_index=True)
+        dados = concat([dados, read_csv(arquivo).fillna(value='')], ignore_index=True)
  
     dados_sem_duplicados = dados.drop_duplicates()
     dados_filtrados = dados_sem_duplicados[~dados_sem_duplicados['Event Description'].astype(str).str.contains('Infected file deleted.')]
